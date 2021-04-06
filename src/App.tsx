@@ -1,25 +1,45 @@
 import React from 'react';
-import logo from './logo.svg';
+import { Provider } from 'react-redux';
+import styled from 'styled-components';
 import './App.css';
+import Board from './components/board/Board';
+import Footer from './components/footer/Footer';
+import Header from './components/header/Header';
+import GlobalStyles from './global-styles';
+import { store } from './store';
 
-function App() {
+const StyledGame = styled.div`
+  height: 100vh;
+  max-height: 100vh;
+  width: 100%;
+
+  padding: 1.75rem;
+
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  
+  align-items: center;
+
+  font-size: 40px;
+  color: white;
+
+  background: radial-gradient(circle at top, hsl(214, 47%, 23%), hsl(237, 49%, 15%));
+`;
+
+const App = () => {
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider store={store}>
+      <React.StrictMode>
+        <GlobalStyles />
+        <StyledGame >
+          <Header />
+          <Board />
+          <Footer />
+        </StyledGame>
+      </React.StrictMode>
+    </Provider>
   );
 }
 
