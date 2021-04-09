@@ -5,28 +5,39 @@ import { RootState } from "../../store";
 import ChoiceStep from "./ChoiceStep";
 import { gsap } from 'gsap';
 import ResultStep from "./ResultStep";
-import { ChoiceData } from "../../model/model";
 import { setSelectedChoice } from "../../reducers/gameReducer";
+import { GAME_MODE, SM_BREAKPOINT } from "../../constants";
+
+export interface ChoiceData {
+  id: number | string,
+  title: string,
+  imageSrc: string,
+  color: string,
+}
 
 const StyledBoard = styled.div`
     min-height: 430px;
     flex: 1;
-
+    
     padding-top: 12px;
     position: relative;
 
     width: fit-content;
     min-width: 480px;
-
+    
     opacity: 1;
     transition: opacity 300ms ease-in;
+    
+    @media screen and (max-width: ${SM_BREAKPOINT}px) {
+      width: 100%;
+      min-width: 100%;
+    }
 `;
 
 const Board = () => {
 
   const [step, setStep] = useState(1);
   const [coords, setCoords] = useState<DOMRect | undefined>();
-  const [tweens, setTweens] = useState([]);
   const { mode, choice } = useSelector((state: RootState) => state.game);
 
   const dispatch = useDispatch();
@@ -40,20 +51,30 @@ const Board = () => {
     }
   }, [step]);
 
+  const animateToResultStep = (choice: ChoiceData) => {
+    // Hiding all chips except for the selected one
+    let i = (mode === GAME_MODE.BASIC) ? 3 : 5;
+    gsap.to('.choice-step', { backgroundImage: 'none', duration: 0.7 }).then(() => {
+      setStep(2);
+    });
+    while (i > 0) {
+      if (choice.id !== i) {
+        gsap.fromTo(`#Chip${i}`, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.5 });
+      }
+      i--;
+    }
+  }
+
   const handleChangeStep = (
     choice?: ChoiceData,
     coords?: DOMRect
   ) => {
 
     const newStep: number = step + 1;
-    console.log("newStep: ", newStep);
 
     if (newStep === 2) {
       coords && setCoords(coords);
-      choice && dispatch(setSelectedChoice);
-      gsap.fromTo('.choice-step', { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.7 }).then(() => {
-        setStep(newStep);
-      });
+      choice && dispatch(setSelectedChoice(choice)) && animateToResultStep(choice)
     }
   };
 

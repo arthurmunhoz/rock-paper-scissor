@@ -1,13 +1,18 @@
 .MuiTypography-h6 {
-    font-size: 1.55rem !important;
-    
-    font-family: var(--font-family) !important;
+  font-size: 1.55rem !important;
 
-    color: var(--dark-text);
+  font-family: var(--font-family) !important;
 
-    font-weight: bold;
-    line-height: 1.6;
-    letter-spacing: 0.0075em;
+  color: var(--dark-text);
 
-    padding-left: 12px;
-  }
+  font-weight: bold;
+  line-height: 1.6;
+  letter-spacing: 0.0075em;
+
+  padding-left: 12px;
+}
+
+body {
+  overflow-x: hidden;
+  overflow-y: auto;
+}

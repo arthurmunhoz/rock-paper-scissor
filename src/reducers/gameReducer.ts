@@ -1,6 +1,6 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
+import { ChoiceData } from "../components/board/Board";
 import { GAME_MODE } from '../constants';
-import { ChoiceData } from "../model/model";
 
 export type AppState = {
     mode: string,
@@ -20,7 +20,7 @@ export const gameReducer = createSlice({
     reducers: {
         //SET SELECTED CHOICE
         setSelectedChoice: (state, action) => {
-            console.log("Selected choice: ", state.choice);
+            console.log("Selected choice: ", action.payload);
             state.choice = action.payload;
         },
     },

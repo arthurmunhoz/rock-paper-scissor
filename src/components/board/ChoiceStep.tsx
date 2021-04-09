@@ -1,14 +1,11 @@
 import styled from "styled-components";
 import Triangle from '../../res/images/bg-triangle.svg'
 import Chip from "../chip/Chip";
-import Paper from '../../res/images/icon-paper.svg'
-import Scissor from '../../res/images/icon-scissors.svg'
-import Rock from '../../res/images/icon-rock.svg'
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
-import { CHOICE_DATA, GAME_MODE } from "../../constants";
-import { gsap } from 'gsap';
-import { ChoiceData } from "../../model/model";
+import { CHOICE_DATA, GAME_MODE, SM_BREAKPOINT } from "../../constants";
+import { ChoiceData } from "./Board";
+import { useRef } from "react";
 
 const StyledChoiceStep = styled.div`
 
@@ -29,17 +26,33 @@ const StyledChoiceStep = styled.div`
     /* background-color: rgba(255, 255, 255, 0.342); */
     
     #Chip1 {
-        margin-bottom: 50%;
-        transform: translateX(-150px);
+      transform: translateX(-140px) translateY(-120px);
     }
 
     #Chip2 {
-        margin-bottom: 50%;
-        transform: translateX(150px);
+      transform: translateX(140px) translateY(-120px);
+
     }
 
     #Chip3 {
-        margin-top: 50%;
+      transform: translateY(100px);
+    }
+
+    @media screen and (max-width: ${SM_BREAKPOINT}px) {
+
+      background-size: 240px;
+
+      #Chip1 {
+        transform: translateX(-100px) translateY(-100px);
+      }
+
+      #Chip2 {
+        transform: translateX(100px) translateY(-100px);
+      }
+
+      #Chip3 {
+        transform: translateY(70px);
+      }
     }
 `;
 
@@ -51,21 +64,25 @@ const ChoiceStep = (props: ChoiceStepProps) => {
 
   const mode = useSelector((state: RootState) => state.game.mode);
 
+  const chipPaperRef = useRef<HTMLDivElement>(null);
+  const chipScissorRef = useRef<HTMLDivElement>(null);
+  const chipRockRef = useRef<HTMLDivElement>(null);
+  const chipLizardRef = useRef<HTMLDivElement>(null);
+  const chipSpockRef = useRef<HTMLDivElement>(null);
+
   const handleOnClick = (choice: ChoiceData, coords: DOMRect) => {
-    console.log("IDDDDD", `#Chip${choice.id}`)
-    gsap.fromTo(`#Chip${choice.id}`, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.5 })
-      .then((result) => props.onChipSelected(choice, coords));
+    props.onChipSelected(choice, coords);
   }
 
   return (<StyledChoiceStep className="choice-step">
-    <Chip choice={CHOICE_DATA.PAPER} onClick={handleOnClick} />
-    <Chip choice={CHOICE_DATA.SCISSORS} onClick={handleOnClick} />
-    <Chip choice={CHOICE_DATA.ROCK} onClick={handleOnClick} />
+    <Chip ref={chipPaperRef} choice={CHOICE_DATA.PAPER} onClick={handleOnClick} />
+    <Chip ref={chipScissorRef} choice={CHOICE_DATA.SCISSORS} onClick={handleOnClick} />
+    <Chip ref={chipRockRef} choice={CHOICE_DATA.ROCK} onClick={handleOnClick} />
     {
       (mode === GAME_MODE.BONUS) &&
       <>
-        <Chip choice={CHOICE_DATA.LIZARD} onClick={handleOnClick} />
-        <Chip choice={CHOICE_DATA.SPOCK} onClick={handleOnClick} />
+        <Chip ref={chipLizardRef} choice={CHOICE_DATA.LIZARD} onClick={handleOnClick} />
+        <Chip ref={chipSpockRef} choice={CHOICE_DATA.SPOCK} onClick={handleOnClick} />
       </>
     }
   </StyledChoiceStep>);

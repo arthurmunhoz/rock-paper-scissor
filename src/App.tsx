@@ -10,7 +10,6 @@ import { store } from './store';
 
 const StyledGame = styled.div`
   height: 100vh;
-  max-height: 100vh;
   width: 100%;
 
   padding: 1.75rem;

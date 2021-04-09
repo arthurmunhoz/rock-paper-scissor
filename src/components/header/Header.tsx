@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { GAME_MODE } from '../../constants';
+import { GAME_MODE, SM_BREAKPOINT } from '../../constants';
 import { RootState } from '../../store';
 
 const StyledHeader = styled.header`
@@ -51,11 +51,32 @@ const StyledHeader = styled.header`
       font-size: 3.5rem;
       line-height: 2.8rem
     }
+
+    @media screen and (max-width: ${SM_BREAKPOINT}px) {
+      width: 90%;
+      padding: 1.15rem;
+
+      .score-board {        
+        padding: 2px 1.3rem;
+      }
+
+      .score-board > h1 {
+        font-size: 2.5rem;
+        line-height: 2rem
+      }
+
+      .game-mode-texts {
+      font-size: 1.7rem;
+      word-spacing: 100vw;
+      line-height: 1.5rem;
+    }
+
+    }
 `;
 
 const Header = () => {
 
-  const { mode, score} = useSelector((state: RootState) => state.game)
+  const { mode, score } = useSelector((state: RootState) => state.game)
 
   console.log("appMode", mode)
 

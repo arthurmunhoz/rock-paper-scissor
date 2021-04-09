@@ -1,10 +1,9 @@
 
 import { createGlobalStyle } from 'styled-components';
 import {
+    CHOICE_SIZE,
     LG_BREAKPOINT,
-    LG_CHOICE_SIZE,
     LG_CHOICE_SCALE,
-    SM_CHOICE_SIZE,
     BONUS_LG_CHOICE_SCALE,
     BONUS_SM_CHOICE_SCALE,
 } from './constants';
