@@ -6,7 +6,7 @@ import ChoiceStep from "./ChoiceStep";
 import { gsap } from 'gsap';
 import ResultStep from "./ResultStep";
 import { setSelectedChoice } from "../../reducers/gameReducer";
-import { GAME_MODE, SM_BREAKPOINT } from "../../constants";
+import { BOARD_HEIGHT, BOARD_WIDTH, GAME_MODE, SM_BREAKPOINT } from "../../constants";
 
 export interface ChoiceData {
   id: number | string,
@@ -16,14 +16,15 @@ export interface ChoiceData {
 }
 
 const StyledBoard = styled.div`
-    min-height: 430px;
+    height: ${() => BOARD_HEIGHT}px;
     flex: 1;
     
     padding-top: 12px;
     position: relative;
 
-    width: fit-content;
-    min-width: 480px;
+    width: ${() => BOARD_WIDTH}px;
+    min-width: ${() => BOARD_HEIGHT}px;
+    /* max-width: 100%; */
     
     opacity: 1;
     transition: opacity 300ms ease-in;
@@ -32,6 +33,8 @@ const StyledBoard = styled.div`
       width: 100%;
       min-width: 100%;
     }
+
+    /* background-color: rgba(255, 255, 255, 0.185); */
 `;
 
 const Board = () => {

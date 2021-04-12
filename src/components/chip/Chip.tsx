@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styled, { css } from "styled-components";
 import { CHOICE_SIZE, LG_CHOICE_SCALE, SM_BREAKPOINT, SM_CHOICE_SCALE } from "../../constants";
 import { ChoiceData } from "../board/Board";
@@ -18,8 +18,6 @@ const StyledChip = styled.div`
     }
 
     border-radius: 50%;
-
-    position: absolute;
 
     display: grid;
     place-items: center;
@@ -59,10 +57,6 @@ const StyledChip = styled.div`
 `;
 
 const Chip = React.forwardRef<HTMLDivElement, ChipData>((props, ref) => {
-
-    useEffect(() => {
-        console.log("REF TO STRING", ref)
-    }, [ref]);
 
     const handleOnClick = () => {
 

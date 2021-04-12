@@ -26,15 +26,18 @@ const StyledChoiceStep = styled.div`
     /* background-color: rgba(255, 255, 255, 0.342); */
     
     #Chip1 {
+    position: absolute;
       transform: translateX(-140px) translateY(-120px);
     }
 
     #Chip2 {
+    position: absolute;
       transform: translateX(140px) translateY(-120px);
 
     }
 
     #Chip3 {
+    position: absolute;
       transform: translateY(100px);
     }
 
