@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import gsap from 'gsap';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import {
     LG_BREAKPOINT,
     LG_CHOICE_SCALE,
@@ -23,13 +23,17 @@ import { ChoiceData } from './Board';
 
 interface ResultStepProps {
     coords?: DOMRect,
-    choice?: ChoiceData
+    playerChoice?: ChoiceData,
+    gameChoice?: ChoiceData,
+    resultText: string
 };
 
 const ResultStep = (props: ResultStepProps) => {
 
     console.log("Coords: ", props.coords);
-    console.log("User choice: ", props.choice);
+    console.log("User choice: ", props.playerChoice);
+    console.log("Game choice: ", props.gameChoice);
+    console.log("Result text: ", props.resultText);
 
     const boardRef = useRef<HTMLDivElement>(null);
     const gameChoiceRef = useRef<HTMLDivElement>(null);
@@ -38,12 +42,9 @@ const ResultStep = (props: ResultStepProps) => {
     const PLAYER_CHOICE_ID = "_playerChoice";
     const GAME_CHOICE_ID = "_gameChoice";
 
-    const [gameChoice, setGameChoice] = useState<ChoiceData>();
-    const [resultText, setResultText] = useState<String>("");
-    
-    const isSmScreen = document.documentElement.clientWidth < LG_BREAKPOINT;
+    const isSmScreen = document.documentElement.clientWidth < SM_BREAKPOINT;
 
-    const defaultScale = 1.15;
+    // const defaultScale = 1.15;
 
     const getScaleAndSize = () => {
         if (document.documentElement.clientWidth <= MB_BREAKPOINT) {
@@ -55,28 +56,27 @@ const ResultStep = (props: ResultStepProps) => {
         }
     }
 
-    // const offset = calcOffset(CHOICE_SIZE * (isSmScreen ? SM_CHOICE_SCALE : LG_CHOICE_SCALE), scale);
-
-    const playerPos = {
-        // x: 0,
-        x: (BOARD_WIDTH / 2 - 15) - getScaleAndSize().size * defaultScale,
-        // y: 0
-        y: ((document.documentElement.clientHeight - 190) / 2) - (getScaleAndSize().size / 2)
+    const calcOffset = (squareDimension: number, scale: number) => {
+        return squareDimension * ((1 - scale) / 2);
     };
 
-    const gamePos = {
-        x: BOARD_WIDTH / 2 + 40,
-        y: ((document.documentElement.clientHeight - 190) / 2) - (getScaleAndSize().size / 2)
-    };
+    const offset = calcOffset(CHOICE_SIZE * (isSmScreen ? SM_CHOICE_SCALE : LG_CHOICE_SCALE), getScaleAndSize().scale);
+
+    // const playerPos = {
+    //     // x: 0,
+    //     x: (BOARD_WIDTH / 2 - 15) - getScaleAndSize().size * defaultScale,
+    //     // y: 0
+    //     y: ((document.documentElement.clientHeight - 190) / 2) - (getScaleAndSize().size / 2)
+    // };
+
+    // const gamePos = {
+    //     x: BOARD_WIDTH / 2 + 40,
+    //     y: ((document.documentElement.clientHeight - 190) / 2) - (getScaleAndSize().size / 2)
+    // };
 
     useLayoutEffect(() => {
         animateShowChoices();
-        makeHouseChoice();
     }, []);
-
-    useEffect(() => {
-        determineResult();
-    }, [gameChoice]);
 
     const StyledResultStep = styled.div`
         width: 100%;
@@ -87,22 +87,11 @@ const ResultStep = (props: ResultStepProps) => {
         justify-content: center;
 
         @media screen and (max-width: ${SM_BREAKPOINT}px) {
-            
-        }
-
-        #shadowPlaceholder {
-            opacity: 0;
-            
-            height: ${() => getScaleAndSize().size}px;
-            width: ${() => getScaleAndSize().size}px;
-
-            scale: ${() => getScaleAndSize().scale};
-            border-radius: 50%;
-            background-color: rgba(0, 0, 0, 0.203);
-    
-            transform: translateX(36px);
-            
-            z-index: 0;
+            font-size: 1rem;//${() => 1.35 * getScaleAndSize().scale}rem;
+            #labelsFrame {
+                position: absolute;
+                margin-top: ${() => 1.85 * getScaleAndSize().size}px;
+            }
         }
         
         #youPicked {
@@ -110,7 +99,7 @@ const ResultStep = (props: ResultStepProps) => {
         }
 
         #housePicked {
-            transform: translateX(36px);
+            transform: translateX(28px);
         }
 
         #youPicked,
@@ -124,7 +113,7 @@ const ResultStep = (props: ResultStepProps) => {
             white-space: nowrap;
             text-align: center;
 
-            margin-bottom: 18px;
+            margin-bottom: 32px;
         }
         
         #labelsFrame {
@@ -135,7 +124,7 @@ const ResultStep = (props: ResultStepProps) => {
         }
         
         #textResultFrame {
-            opacity: 1;
+            opacity: 0;
 
             height: fit-content;
             width: 100%;
@@ -179,7 +168,6 @@ const ResultStep = (props: ResultStepProps) => {
 
         #choicesFrame {
             width: 100%;
-
             display: flex;
             flex-direction: row;
             justify-content: center;
@@ -188,7 +176,7 @@ const ResultStep = (props: ResultStepProps) => {
 
         #Chip${PLAYER_CHOICE_ID} {
             opacity: 1;
-            transform: translateX(-36px);
+            /* scale: ${() => getScaleAndSize().scale}; */
             z-index: 3;
         }
         
@@ -196,37 +184,42 @@ const ResultStep = (props: ResultStepProps) => {
             opacity: 1;
             z-index: 3;
         }
+
+        #shadowPlaceholder {
+            opacity: 0;
+            
+            height: ${() => getScaleAndSize().size}px;
+            width: ${() => getScaleAndSize().size}px;
+
+            /* scale: ${() => getScaleAndSize().scale}; */
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.203);
+    
+            transform: translateX(25px);
+            
+            z-index: 0;
+        }
     `;
-
-    const calcOffset = (squareDimension: number, scale: number) => {
-        return squareDimension * ((1 - scale) / 2);
-    };
-
-    const makeHouseChoice = () => {
-        const rand = Math.ceil(Math.random() * 100 % 3);
-        const choice = Object.keys(CHOICE_DATA).find((item) => CHOICE_DATA[item].id === rand + 1);
-
-        setGameChoice(CHOICE_DATA[choice!]);
-    }
 
     const animateShowChoices = () => {
 
         const pos = playerChoiceRef.current?.getBoundingClientRect();
         // -----------------------------------------
         // Animate player's choice
-        if (props.choice && pos) {
+        if (props.playerChoice && pos) {
 
             gsap.fromTo(
                 `#Chip${PLAYER_CHOICE_ID}`,
                 {
                     x: props.coords ? props.coords?.x - (pos?.x ?? 0) : 0,
                     y: props.coords ? props.coords?.y - (pos?.y ?? 0) : 0,
-                    autoAlpha: 1,
-                    scale: 1,
+                    // autoAlpha: 0,
+                    scale: getScaleAndSize().scale,
                 },
                 {
-                    x: 0,
+                    x: -25,
                     y: 0,
+                    // autoAlpha: 1,
                     scale: 1.15,
                     ease: 'power1.in',
                     duration: 0.5
@@ -274,50 +267,77 @@ const ResultStep = (props: ResultStepProps) => {
                         },
                         {
                             autoAlpha: 1,
-                            scale: 1.15,
+                            scale: 1,
                             duration: 0.5,
                             delay: 0.8
                         });
 
+                    // -----------------------------------------
+                    // Slide choices to the sides
+                    if (!isSmScreen) {
+                        tl.to(['#youPicked', `#Chip${PLAYER_CHOICE_ID}`],
+                            {
+                                x: -133, duration: 1, delay: 0.5
+                            }
+                        );
+
+                        tl.to(['#housePicked', '#shadowPlaceholder'],
+                            {
+                                x: 133, duration: 1, delay: -1
+                            }
+                        );
+                    } else {
+                        tl.to(['#youPicked', `#Chip${PLAYER_CHOICE_ID}`],
+                            {
+                                y: -110, duration: 1, delay: 0.5
+                            }
+                        );
+
+                        tl.to(['#housePicked', '#shadowPlaceholder'],
+                            {
+                                y: -110, duration: 1, delay: -1
+                            }
+                        );
+                    }
+
+                    // -----------------------------------------
+                    // Show game result
+                    if (!isSmScreen) {
+                        tl.to(['#textResultFrame'],
+                            {
+                                y: 40,
+                                autoAlpha: 1, 
+                                ease: 'ease.in', 
+                                duration: 1,
+                                delay: -0.5
+                            }
+                        );
+                    } else {
+                        tl.fromTo(['#textResultFrame'],
+                            {
+                                autoAlpha: 0,
+                            },
+                            {
+                                autoAlpha: 1,
+                                duration: 1.5, 
+                                delay: -1
+                            }
+                        );
+
+                        tl.to(['#textResultFrame'],
+                            {
+                                y: 133, 
+                                duration: 1, 
+                                delay: -1.5
+                            }
+                        );
+                    }
 
                 });
         }
     }
 
-    const determineResult = () => {
 
-        // id: 1 -> ROCK
-        // id: 2 -> PAPER
-        // id: 3 -> SCISSOR
-
-        if (props.choice && gameChoice) {
-
-            if (props.choice?.id === gameChoice.id) {
-                setResultText(GAME_RESULTS.DRAW);
-            } else {
-                // PLAYER CHOICE: ROCK
-                if (props.choice.id === 1) {
-                    (gameChoice.id === 2) ?
-                        setResultText(GAME_RESULTS.LOSE) :
-                        setResultText(GAME_RESULTS.WIN);
-                }
-
-                // PLAYER CHOICE: PAPER
-                if (props.choice.id === 2) {
-                    (gameChoice.id === 3) ?
-                        setResultText(GAME_RESULTS.LOSE) :
-                        setResultText(GAME_RESULTS.WIN);
-                }
-
-                // PLAYER CHOICE: SCISSOR
-                if (props.choice.id === 3) {
-                    (gameChoice.id === 1) ?
-                        setResultText(GAME_RESULTS.LOSE) :
-                        setResultText(GAME_RESULTS.WIN);
-                }
-            }
-        }
-    }
 
     return (<StyledResultStep
         id="resultFrame"
@@ -330,14 +350,14 @@ const ResultStep = (props: ResultStepProps) => {
                 </div>
 
                 <div id="choicesFrame">
-                    <Chip ref={playerChoiceRef} choice={{ ...props.choice!, id: PLAYER_CHOICE_ID }} />
+                    <Chip ref={playerChoiceRef} choice={{ ...props.playerChoice!, id: PLAYER_CHOICE_ID }} />
                     <div id="shadowPlaceholder">
-                        <Chip ref={gameChoiceRef} choice={{ ...gameChoice!, id: GAME_CHOICE_ID }} />
+                        <Chip ref={gameChoiceRef} choice={{ ...props.gameChoice!, id: GAME_CHOICE_ID }} />
                     </div>
                 </div>
 
                 <div id="textResultFrame">
-                    <span id="result-text">{resultText}</span>
+                    <span id="result-text">{props.resultText}</span>
                     <button id="result-text" className="choice-text">Play again</button>
                 </div>
             </>

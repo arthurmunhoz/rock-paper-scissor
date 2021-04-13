@@ -1,3 +1,4 @@
+import gsap from "gsap";
 import React from "react";
 import styled, { css } from "styled-components";
 import { CHOICE_SIZE, LG_CHOICE_SCALE, SM_BREAKPOINT, SM_CHOICE_SCALE } from "../../constants";
@@ -25,7 +26,11 @@ const StyledChip = styled.div`
     opacity: 0.9;
     box-shadow: inset 0px -7px 1px -1px rgba(0, 0, 0, 0.171);
 
-    cursor: pointer;
+    ${(props) => { 
+        if (props.onClick) {
+            return css`cursor: pointer`
+        }}
+    };
 
     :hover {
         opacity: 1;
@@ -60,20 +65,31 @@ const Chip = React.forwardRef<HTMLDivElement, ChipData>((props, ref) => {
 
     const handleOnClick = () => {
 
-        ref && console.log("CHIP ELEMENT: ", document.getElementById(`Chip${props.choice.id}`)?.getBoundingClientRect());
+        gsap.fromTo(`#Chip${props.choice.id}`,
+            {
+                scale: 1
+            },
+            {
+                scale: 0.9,
+                duration: 0.1,
+                repeat: 1,
+                yoyo: true
+            }).then(() => {
+                ref && console.log("CHIP ELEMENT: ", document.getElementById(`Chip${props.choice.id}`)?.getBoundingClientRect());
 
-        const el = document.getElementById(`Chip${props.choice.id}`);
+                const el = document.getElementById(`Chip${props.choice.id}`);
 
-        if (props.onClick && el) {
-            props.onClick(props.choice, el.getBoundingClientRect());
-        }
+                if (props.onClick && el) {
+                    props.onClick(props.choice, el.getBoundingClientRect());
+                }
+            });
     }
 
     return (<StyledChip
         {...props}
         ref={ref}
         id={`Chip${props.choice.id}`}
-        onClick={handleOnClick}>
+        onClick={props.onClick ? handleOnClick : undefined}>
         <div className="image-frame"></div>
     </StyledChip>);
 });

@@ -11,12 +11,6 @@ const StyledChoiceStep = styled.div`
 
     height: 100%;
     width: 100%;
-    display: flex;
-
-    background-image: url(${Triangle});
-    background-repeat: no-repeat;
-    background-position-x: center;
-    background-position-y: center;
 
     display: grid;
     place-items: center;
@@ -25,6 +19,15 @@ const StyledChoiceStep = styled.div`
     opacity: 0;
     /* background-color: rgba(255, 255, 255, 0.342); */
     
+    .background-frame {
+      height: 100%;
+      width: 100%;
+      background-image: url(${Triangle});
+      background-repeat: no-repeat;
+      background-position-x: center;
+      background-position-y: center;
+    }
+
     #Chip1 {
     position: absolute;
       transform: translateX(-140px) translateY(-120px);
@@ -78,6 +81,7 @@ const ChoiceStep = (props: ChoiceStepProps) => {
   }
 
   return (<StyledChoiceStep className="choice-step">
+    <div className="background-frame"></div>
     <Chip ref={chipPaperRef} choice={CHOICE_DATA.PAPER} onClick={handleOnClick} />
     <Chip ref={chipScissorRef} choice={CHOICE_DATA.SCISSORS} onClick={handleOnClick} />
     <Chip ref={chipRockRef} choice={CHOICE_DATA.ROCK} onClick={handleOnClick} />
