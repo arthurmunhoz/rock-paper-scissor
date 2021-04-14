@@ -5,7 +5,7 @@ import { RootState } from "../../store";
 import ChoiceStep from "./ChoiceStep";
 import { gsap } from 'gsap';
 import ResultStep from "./ResultStep";
-import { setSelectedChoice } from "../../reducers/gameReducer";
+import { resetChoice, setSelectedChoice } from "../../reducers/gameReducer";
 import { BOARD_HEIGHT, BOARD_WIDTH, CHOICE_DATA, GAME_MODE, GAME_RESULTS, SM_BREAKPOINT } from "../../constants";
 
 export interface ChoiceData {
@@ -24,7 +24,6 @@ const StyledBoard = styled.div`
 
     width: ${() => BOARD_WIDTH}px;
     min-width: ${() => BOARD_HEIGHT}px;
-    /* max-width: 100%; */
     
     opacity: 1;
     transition: opacity 300ms ease-in;
@@ -34,14 +33,14 @@ const StyledBoard = styled.div`
       min-width: 100%;
     }
 
-    background-color: rgba(255, 255, 255, 0.185);
+    /* background-color: rgba(255, 255, 255, 0.185); */
 `;
 
 const Board = () => {
 
   const [step, setStep] = useState(1);
   const [coords, setCoords] = useState<DOMRect | undefined>();
-  const { mode, choice } = useSelector((state: RootState) => state.game);
+  const { mode, playerChoice } = useSelector((state: RootState) => state.game);
   const [gameChoice, setGameChoice] = useState<ChoiceData>();
   const [resultText, setResultText] = useState("");
 
@@ -55,46 +54,49 @@ const Board = () => {
     console.log("step: ", step);
     
     if (step === 1) {
+      dispatch(resetChoice());
       gsap.fromTo('.choice-step', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.5 });
       gsap.fromTo('.choice-step', { scale: 0 }, { scale: 1, duration: 0.5 });
     }
   }, [step]);
   
   useEffect(() => {
-    gameChoice && determineResult();
-  }, [gameChoice]);
+    console.log("House choice: ", gameChoice);
+    playerChoice && determineResult();
+  }, [playerChoice]);
   
   useEffect(() => {
     console.log("Result text: ", resultText);
+    resultText && playerChoice && animateToResultStep(playerChoice)
   }, [resultText]);
-
+  
   const determineResult = () => {
-
+    
     // id: 1 -> ROCK
     // id: 2 -> PAPER
     // id: 3 -> SCISSOR
 
-    if (choice && gameChoice) {
-
-      if (choice.id === gameChoice.id) {
+    if (playerChoice && gameChoice) {
+      
+      if (playerChoice.id === gameChoice.id) {
         setResultText(GAME_RESULTS.DRAW);
       } else {
         // PLAYER CHOICE: ROCK
-        if (choice.id === 1) {
+        if (playerChoice.id === 1) {
           (gameChoice.id === 2) ?
-            setResultText(GAME_RESULTS.LOSE) :
-            setResultText(GAME_RESULTS.WIN);
+          setResultText(GAME_RESULTS.LOSE) :
+          setResultText(GAME_RESULTS.WIN);
         }
-
+        
         // PLAYER CHOICE: PAPER
-        if (choice.id === 2) {
+        if (playerChoice.id === 2) {
           (gameChoice.id === 3) ?
-            setResultText(GAME_RESULTS.LOSE) :
-            setResultText(GAME_RESULTS.WIN);
+          setResultText(GAME_RESULTS.LOSE) :
+          setResultText(GAME_RESULTS.WIN);
         }
-
+        
         // PLAYER CHOICE: SCISSOR
-        if (choice.id === 3) {
+        if (playerChoice.id === 3) {
           (gameChoice.id === 1) ?
             setResultText(GAME_RESULTS.LOSE) :
             setResultText(GAME_RESULTS.WIN);
@@ -142,7 +144,6 @@ const Board = () => {
   const makeHouseChoice = () => {
     const rand = Math.ceil(Math.random() * 100 % 3);
     const choice = Object.keys(CHOICE_DATA).find((item) => CHOICE_DATA[item].id === rand);
-
     setGameChoice(CHOICE_DATA[choice!]);
   }
 
@@ -155,20 +156,21 @@ const Board = () => {
 
     if (newStep === 2) {
       coords && setCoords(coords);
-      choice && dispatch(setSelectedChoice(choice)) && animateToResultStep(choice)
+      choice && dispatch(setSelectedChoice(choice))
     }
   };
 
   return (<StyledBoard>
     {
       (step === 1) ?
-        <ChoiceStep onChipSelected={handleChangeStep} /> :
+        <ChoiceStep onChoiceMade={handleChangeStep} /> :
         (step === 2) ?
           <ResultStep
             coords={coords}
             gameChoice={gameChoice}
-            playerChoice={choice}
+            playerChoice={playerChoice}
             resultText={resultText}
+            onResetGame={() => setStep(1)}
           /> : <div></div>
     }
   </StyledBoard>);

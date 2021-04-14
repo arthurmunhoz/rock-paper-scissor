@@ -1,22 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import gsap from 'gsap';
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import styled, { css } from "styled-components";
+import React, { useLayoutEffect, useRef } from 'react';
+import styled from "styled-components";
 import {
-    LG_BREAKPOINT,
     LG_CHOICE_SCALE,
     MB_BREAKPOINT,
     MB_CHOICE_SCALE,
     SM_BREAKPOINT,
     SM_CHOICE_SCALE,
     CHOICE_SIZE,
-    CHOICE_DATA,
     LG_MARGIN,
     MB_MARGIN,
     SM_MARGIN,
-    BOARD_WIDTH,
-    BOARD_HEIGHT,
-    GAME_RESULTS
 } from '../../constants';
 import Chip from '../chip/Chip';
 import { ChoiceData } from './Board';
@@ -25,7 +20,8 @@ interface ResultStepProps {
     coords?: DOMRect,
     playerChoice?: ChoiceData,
     gameChoice?: ChoiceData,
-    resultText: string
+    resultText: string,
+    onResetGame: Function
 };
 
 const ResultStep = (props: ResultStepProps) => {
@@ -44,8 +40,6 @@ const ResultStep = (props: ResultStepProps) => {
 
     const isSmScreen = document.documentElement.clientWidth < SM_BREAKPOINT;
 
-    // const defaultScale = 1.15;
-
     const getScaleAndSize = () => {
         if (document.documentElement.clientWidth <= MB_BREAKPOINT) {
             return { scale: MB_CHOICE_SCALE, size: CHOICE_SIZE * MB_CHOICE_SCALE, margin: MB_MARGIN };
@@ -55,24 +49,6 @@ const ResultStep = (props: ResultStepProps) => {
             return { scale: LG_CHOICE_SCALE, size: CHOICE_SIZE * LG_CHOICE_SCALE, margin: LG_MARGIN };
         }
     }
-
-    const calcOffset = (squareDimension: number, scale: number) => {
-        return squareDimension * ((1 - scale) / 2);
-    };
-
-    const offset = calcOffset(CHOICE_SIZE * (isSmScreen ? SM_CHOICE_SCALE : LG_CHOICE_SCALE), getScaleAndSize().scale);
-
-    // const playerPos = {
-    //     // x: 0,
-    //     x: (BOARD_WIDTH / 2 - 15) - getScaleAndSize().size * defaultScale,
-    //     // y: 0
-    //     y: ((document.documentElement.clientHeight - 190) / 2) - (getScaleAndSize().size / 2)
-    // };
-
-    // const gamePos = {
-    //     x: BOARD_WIDTH / 2 + 40,
-    //     y: ((document.documentElement.clientHeight - 190) / 2) - (getScaleAndSize().size / 2)
-    // };
 
     useLayoutEffect(() => {
         animateShowChoices();
@@ -87,11 +63,23 @@ const ResultStep = (props: ResultStepProps) => {
         justify-content: center;
 
         @media screen and (max-width: ${SM_BREAKPOINT}px) {
+            
             font-size: 1rem;//${() => 1.35 * getScaleAndSize().scale}rem;
+            
             #labelsFrame {
-                position: absolute;
-                margin-top: ${() => 1.85 * getScaleAndSize().size}px;
+                order: 2;
+                /* position: absolute; */
+                margin-top: 12px;
             }
+
+            #resultText {
+                font-size: 2.5rem !important;
+            }
+        }
+
+        #resultFrame {
+            display: flex;
+            flex: row;
         }
         
         #youPicked {
@@ -121,6 +109,10 @@ const ResultStep = (props: ResultStepProps) => {
             display: flex;
             flex-direction: row;
             justify-content: center;
+        }
+
+        #resultText {
+            font-size: 3rem;
         }
         
         #textResultFrame {
@@ -176,7 +168,6 @@ const ResultStep = (props: ResultStepProps) => {
 
         #Chip${PLAYER_CHOICE_ID} {
             opacity: 1;
-            /* scale: ${() => getScaleAndSize().scale}; */
             z-index: 3;
         }
         
@@ -191,7 +182,6 @@ const ResultStep = (props: ResultStepProps) => {
             height: ${() => getScaleAndSize().size}px;
             width: ${() => getScaleAndSize().size}px;
 
-            /* scale: ${() => getScaleAndSize().scale}; */
             border-radius: 50%;
             background-color: rgba(0, 0, 0, 0.203);
     
@@ -213,13 +203,11 @@ const ResultStep = (props: ResultStepProps) => {
                 {
                     x: props.coords ? props.coords?.x - (pos?.x ?? 0) : 0,
                     y: props.coords ? props.coords?.y - (pos?.y ?? 0) : 0,
-                    // autoAlpha: 0,
                     scale: getScaleAndSize().scale,
                 },
                 {
                     x: -25,
                     y: 0,
-                    // autoAlpha: 1,
                     scale: 1.15,
                     ease: 'power1.in',
                     duration: 0.5
@@ -305,9 +293,9 @@ const ResultStep = (props: ResultStepProps) => {
                     if (!isSmScreen) {
                         tl.to(['#textResultFrame'],
                             {
-                                y: 40,
-                                autoAlpha: 1, 
-                                ease: 'ease.in', 
+                                y: 20,
+                                autoAlpha: 1,
+                                ease: 'ease.in',
                                 duration: 1,
                                 delay: -0.5
                             }
@@ -319,15 +307,15 @@ const ResultStep = (props: ResultStepProps) => {
                             },
                             {
                                 autoAlpha: 1,
-                                duration: 1.5, 
+                                duration: 1.5,
                                 delay: -1
                             }
                         );
 
                         tl.to(['#textResultFrame'],
                             {
-                                y: 133, 
-                                duration: 1, 
+                                y: 110,
+                                duration: 1,
                                 delay: -1.5
                             }
                         );
@@ -337,31 +325,29 @@ const ResultStep = (props: ResultStepProps) => {
         }
     }
 
+    return (<StyledResultStep id="resultFrame" ref={boardRef}>
 
+        <div id="labelsFrame">
+            <span id="youPicked" className="choice-text">You picked</span>
+            <span id="housePicked" className="choice-text">The house picked</span>
+        </div>
 
-    return (<StyledResultStep
-        id="resultFrame"
-        ref={boardRef}>
-        {
-            <>
-                <div id="labelsFrame">
-                    <span id="youPicked" className="choice-text">You picked</span>
-                    <span id="housePicked" className="choice-text">The house picked</span>
-                </div>
+        <div id="choicesFrame">
+            <Chip ref={playerChoiceRef} choice={{ ...props.playerChoice!, id: PLAYER_CHOICE_ID }} />
+            <div id="shadowPlaceholder">
+                <Chip ref={gameChoiceRef} choice={{ ...props.gameChoice!, id: GAME_CHOICE_ID }} />
+            </div>
+        </div>
 
-                <div id="choicesFrame">
-                    <Chip ref={playerChoiceRef} choice={{ ...props.playerChoice!, id: PLAYER_CHOICE_ID }} />
-                    <div id="shadowPlaceholder">
-                        <Chip ref={gameChoiceRef} choice={{ ...props.gameChoice!, id: GAME_CHOICE_ID }} />
-                    </div>
-                </div>
-
-                <div id="textResultFrame">
-                    <span id="result-text">{props.resultText}</span>
-                    <button id="result-text" className="choice-text">Play again</button>
-                </div>
-            </>
-        }
+        <div id="textResultFrame">
+            <span id="resultText">{props.resultText}</span>
+            <button
+                className="choice-text"
+                onClick={() => props.onResetGame()}
+            >
+                Play again
+                    </button>
+        </div>
     </StyledResultStep>);
 }
 

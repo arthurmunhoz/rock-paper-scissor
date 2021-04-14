@@ -4,13 +4,13 @@ import { GAME_MODE } from '../constants';
 
 export type AppState = {
     mode: string,
-    choice: ChoiceData | undefined,
+    playerChoice: ChoiceData | undefined,
     score: number
 };
 
 const initialState: AppState = {
     mode: GAME_MODE.BASIC,
-    choice: undefined,
+    playerChoice: undefined,
     score: 0,
 };
 
@@ -21,14 +21,19 @@ export const gameReducer = createSlice({
         //SET SELECTED CHOICE
         setSelectedChoice: (state, action) => {
             console.log("Selected choice: ", action.payload);
-            state.choice = action.payload;
+            state.playerChoice = action.payload;
         },
+        resetChoice: (state) => {
+            console.log("Reseting player choice...");
+            state.playerChoice = undefined;
+        }
     },
     extraReducers: {}
 });
 
 export const {
-    setSelectedChoice
+    setSelectedChoice,
+    resetChoice
 } = gameReducer.actions;
 
 export default gameReducer.reducer;

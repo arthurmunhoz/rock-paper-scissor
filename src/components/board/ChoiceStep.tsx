@@ -17,8 +17,13 @@ const StyledChoiceStep = styled.div`
     position: relative;
 
     opacity: 0;
-    /* background-color: rgba(255, 255, 255, 0.342); */
     
+    @media screen and (max-width: ${SM_BREAKPOINT}px) {
+      .background-frame {
+        background-size: 230px;
+      }
+    }
+
     .background-frame {
       height: 100%;
       width: 100%;
@@ -63,7 +68,7 @@ const StyledChoiceStep = styled.div`
 `;
 
 interface ChoiceStepProps {
-  onChipSelected: Function
+  onChoiceMade: Function
 }
 
 const ChoiceStep = (props: ChoiceStepProps) => {
@@ -77,7 +82,7 @@ const ChoiceStep = (props: ChoiceStepProps) => {
   const chipSpockRef = useRef<HTMLDivElement>(null);
 
   const handleOnClick = (choice: ChoiceData, coords: DOMRect) => {
-    props.onChipSelected(choice, coords);
+    props.onChoiceMade(choice, coords);
   }
 
   return (<StyledChoiceStep className="choice-step">
