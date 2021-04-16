@@ -1,8 +1,7 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { GAME_MODE, SM_BREAKPOINT } from '../../constants';
-import { RootState } from '../../store';
+
+import { SM_BREAKPOINT } from '../../constants';
 
 const StyledHeader = styled.header`
     width: 60%;
@@ -30,6 +29,8 @@ const StyledHeader = styled.header`
     
     .score-board {
       height: 100%;
+      min-height: 80px !important;
+      width: fit-content;
 
       display: flex;
       flex-direction: column;
@@ -49,7 +50,7 @@ const StyledHeader = styled.header`
 
     .score-board > h1 {
       font-size: 3.5rem;
-      line-height: 2.8rem
+      line-height: 2.8rem;
     }
 
     @media screen and (max-width: ${SM_BREAKPOINT}px) {
@@ -74,22 +75,15 @@ const StyledHeader = styled.header`
     }
 `;
 
-const Header = () => {
-
-  const { mode, score } = useSelector((state: RootState) => state.game)
-
-  console.log("appMode", mode)
-
+const Header = (props: { score: number }) => {
   return (
     <StyledHeader>
       <h1 className="game-mode-texts">
-        {
-          (mode === GAME_MODE.BASIC) ? 'Rock Paper Scissor' : 'Rock Paper Scissor Lizard Spock'
-        }
+          Rock Paper Scissor
       </h1>
       <div className="score-board">
         Score
-        <h1>{score}</h1>
+        <h1>{props.score}</h1>
       </div>
     </StyledHeader>
   );

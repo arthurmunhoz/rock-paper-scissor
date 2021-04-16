@@ -1,9 +1,7 @@
 import styled from "styled-components";
 import Triangle from '../../res/images/bg-triangle.svg'
 import Chip from "../chip/Chip";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store";
-import { CHOICE_DATA, GAME_MODE, SM_BREAKPOINT } from "../../constants";
+import { CHOICE_DATA, SM_BREAKPOINT } from "../../constants";
 import { ChoiceData } from "./Board";
 import { useRef } from "react";
 
@@ -73,13 +71,9 @@ interface ChoiceStepProps {
 
 const ChoiceStep = (props: ChoiceStepProps) => {
 
-  const mode = useSelector((state: RootState) => state.game.mode);
-
   const chipPaperRef = useRef<HTMLDivElement>(null);
   const chipScissorRef = useRef<HTMLDivElement>(null);
   const chipRockRef = useRef<HTMLDivElement>(null);
-  const chipLizardRef = useRef<HTMLDivElement>(null);
-  const chipSpockRef = useRef<HTMLDivElement>(null);
 
   const handleOnClick = (choice: ChoiceData, coords: DOMRect) => {
     props.onChoiceMade(choice, coords);
@@ -90,13 +84,6 @@ const ChoiceStep = (props: ChoiceStepProps) => {
     <Chip ref={chipPaperRef} choice={CHOICE_DATA.PAPER} onClick={handleOnClick} />
     <Chip ref={chipScissorRef} choice={CHOICE_DATA.SCISSORS} onClick={handleOnClick} />
     <Chip ref={chipRockRef} choice={CHOICE_DATA.ROCK} onClick={handleOnClick} />
-    {
-      (mode === GAME_MODE.BONUS) &&
-      <>
-        <Chip ref={chipLizardRef} choice={CHOICE_DATA.LIZARD} onClick={handleOnClick} />
-        <Chip ref={chipSpockRef} choice={CHOICE_DATA.SPOCK} onClick={handleOnClick} />
-      </>
-    }
   </StyledChoiceStep>);
 }
 

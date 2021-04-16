@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
-import styled from "styled-components";
+import { createStyles, IconButton, Theme, Typography, WithStyles, withStyles } from '@material-ui/core';
 import Dialog from '@material-ui/core/Dialog';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
-import MuiDialogActions from '@material-ui/core/DialogActions';
+import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
+import React, { useState } from 'react';
+import styled from 'styled-components';
+
 import Rules from '../../res/images/image-rules.svg';
-import { Button, createStyles, IconButton, Theme, Typography, WithStyles, withStyles } from "@material-ui/core";
-import { url } from "inspector";
 
 const StyledFooter = styled.div`
     width: 100%;
