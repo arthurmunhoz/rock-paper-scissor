@@ -1,13 +1,9 @@
-import { useDispatch, useSelector } from "react-redux";
-import React, { useState, useLayoutEffect, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from "styled-components";
-import { RootState } from "../../store";
 import ChoiceStep from "./ChoiceStep";
 import { gsap } from 'gsap';
 import ResultStep from "./ResultStep";
-import { resetChoice, setSelectedChoice } from "../../reducers/gameReducer";
-import { BOARD_HEIGHT, BOARD_WIDTH, CHOICE_DATA, GAME_MODE, GAME_RESULTS, SM_BREAKPOINT } from "../../constants";
-
+import { BOARD_HEIGHT, BOARD_WIDTH, CHOICE_DATA, GAME_RESULTS, SM_BREAKPOINT } from "../../constants";
 export interface ChoiceData {
   id: number | string,
   title: string,
@@ -32,69 +28,84 @@ const StyledBoard = styled.div`
       width: 100%;
       min-width: 100%;
     }
-
-    /* background-color: rgba(255, 255, 255, 0.185); */
 `;
 
-const Board = () => {
+interface BoardProps {
+  onGameFinished: Function,
+}
+
+const Board = (props: BoardProps) => {
 
   const [step, setStep] = useState(1);
   const [coords, setCoords] = useState<DOMRect | undefined>();
-  const { mode, playerChoice } = useSelector((state: RootState) => state.game);
-  const [gameChoice, setGameChoice] = useState<ChoiceData>();
-  const [resultText, setResultText] = useState("");
-
-  const dispatch = useDispatch();
-
-  useLayoutEffect(() => {
-    makeHouseChoice();
-  }, []);
+  const [gameChoice, setGameChoice] = useState<ChoiceData | undefined>();
+  const [resultText, setResultText] = useState<string | undefined>();
+  const [playerChoice, setPlayerChoice] = useState<ChoiceData | undefined>();
 
   useEffect(() => {
-    console.log("step: ", step);
-    
+    console.log("Step: ", step);
+
     if (step === 1) {
-      dispatch(resetChoice());
+      
+      playerChoice && resetGame();
+      makeHouseChoice();
+
+      //Animate layout
       gsap.fromTo('.choice-step', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.5 });
       gsap.fromTo('.choice-step', { scale: 0 }, { scale: 1, duration: 0.5 });
     }
   }, [step]);
-  
+
+  const resetGame = () => {
+    console.log("Resetting game...: ");
+    setCoords(undefined);
+    setGameChoice(undefined);
+    setResultText("");
+    setPlayerChoice(undefined);
+  }
+
   useEffect(() => {
-    console.log("House choice: ", gameChoice);
+    console.log("Updating player choice: ", playerChoice);
     playerChoice && determineResult();
   }, [playerChoice]);
-  
+
   useEffect(() => {
     console.log("Result text: ", resultText);
     resultText && playerChoice && animateToResultStep(playerChoice)
   }, [resultText]);
-  
+
   const determineResult = () => {
-    
+
     // id: 1 -> ROCK
     // id: 2 -> PAPER
     // id: 3 -> SCISSOR
 
+    console.log("-----------------------")
+    console.log("PLAYER CHOICE: ", playerChoice)
+    console.log("GAME CHOICE: ", gameChoice)
+
     if (playerChoice && gameChoice) {
-      
+
       if (playerChoice.id === gameChoice.id) {
         setResultText(GAME_RESULTS.DRAW);
       } else {
+
         // PLAYER CHOICE: ROCK
         if (playerChoice.id === 1) {
-          (gameChoice.id === 2) ?
-          setResultText(GAME_RESULTS.LOSE) :
-          setResultText(GAME_RESULTS.WIN);
+          if (gameChoice.id === 2) {
+            setResultText(GAME_RESULTS.LOSE)
+          } else {
+            setResultText(GAME_RESULTS.WIN);
+          }
         }
-        
+
         // PLAYER CHOICE: PAPER
         if (playerChoice.id === 2) {
           (gameChoice.id === 3) ?
-          setResultText(GAME_RESULTS.LOSE) :
-          setResultText(GAME_RESULTS.WIN);
+            setResultText(GAME_RESULTS.LOSE) :
+            setResultText(GAME_RESULTS.WIN);
         }
-        
+
         // PLAYER CHOICE: SCISSOR
         if (playerChoice.id === 3) {
           (gameChoice.id === 1) ?
@@ -111,13 +122,13 @@ const Board = () => {
     const timeline = gsap.timeline();
 
     let chips: string[] = [];
-    
-    let i = (mode === GAME_MODE.BASIC) ? 3 : 5;
-    while (i > 0) {
-      if (choice.id !== i) {
-        chips.push(`#Chip${i}`)
+
+    let choiceAmount = 3;
+    while (choiceAmount > 0) {
+      if (choice.id !== choiceAmount) {
+        chips.push(`#Chip${choiceAmount}`)
       }
-      i--;
+      choiceAmount--;
     }
 
     timeline.fromTo(
@@ -138,7 +149,6 @@ const Board = () => {
         delay: -0.4,
         onComplete: () => setStep(2),
       });
-
   }
 
   const makeHouseChoice = () => {
@@ -152,11 +162,12 @@ const Board = () => {
     coords?: DOMRect
   ) => {
 
+    setPlayerChoice(choice);
+
     const newStep: number = step + 1;
 
     if (newStep === 2) {
       coords && setCoords(coords);
-      choice && dispatch(setSelectedChoice(choice))
     }
   };
 
@@ -169,8 +180,9 @@ const Board = () => {
             coords={coords}
             gameChoice={gameChoice}
             playerChoice={playerChoice}
-            resultText={resultText}
+            resultText={resultText ?? ""}
             onResetGame={() => setStep(1)}
+            onGameFinished={props.onGameFinished}
           /> : <div></div>
     }
   </StyledBoard>);
