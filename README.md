@@ -7,6 +7,9 @@ As a version of the famous <b>Rock Paper Scissor</b> game, this project was deve
 The reason I've chosen this challenge in specific, was to be able to learn and practice some new stuff such as <b>StyledComponents</b> and <b>Animations with GSAP</b> ([https://greensock.com/react/](https://greensock.com/react/)).
 <br><br>
 
+## Check It Out!
+[https://arm-rock-paper-scissor.netlify.app/](https://arm-rock-paper-scissor.netlify.app/)<br><br>
+
 ## Technology stack
 - ReactJs
 - Typescript
@@ -18,7 +21,6 @@ The reason I've chosen this challenge in specific, was to be able to learn and p
 - HTML
 
 ## Take a peek at the final result
-[https://arm-rock-paper-scissor.netlify.app/](https://arm-rock-paper-scissor.netlify.app/)<br><br>
 <img height="250px" src="./screenshots/gameStart.png" alt="game beggining"><img>
 <br>
 <img height="250px" src="./screenshots/gameResult.png" alt="game result"><img>
